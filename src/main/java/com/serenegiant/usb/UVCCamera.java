@@ -60,6 +60,8 @@ public class UVCCamera {
 	public static final int PIXEL_FORMAT_RGBX = 3;
 	public static final int PIXEL_FORMAT_YUV420SP = 4;	// NV12
 	public static final int PIXEL_FORMAT_NV21 = 5;		// = YVU420SemiPlanar,NV21，但是保存到jpg颜色失真
+	public static final int PIXEL_FORMAT_YV12 = 6; 		// YUV420 Planar
+	public static final int PIXEL_FORMAT_I420 = 7;
 
 	//--------------------------------------------------------------------------------
     public static final int	CTRL_SCANNING		= 0x00000001;	// D0:  Scanning Mode
@@ -122,6 +124,35 @@ public class UVCCamera {
 			System.loadLibrary("UVCCamera");
 			isLoaded = true;
 		}
+	}
+
+	/**
+	 * Determine frame size in bytes for given parameters.
+	 *
+	 * @param width the width of the frame.
+	 * @param height the height of the frame.
+	 * @param pixelFormat the pixel format.
+	 * @return size of the frame in bytes.
+	 */
+	public static int getFrameSizeInBytes(int width, int height, int pixelFormat) {
+		int size = width * height;
+		switch (pixelFormat) {
+			case PIXEL_FORMAT_RAW:
+			case PIXEL_FORMAT_YUV:
+			case PIXEL_FORMAT_RGB565:
+				size *= 2;
+				break;
+			case PIXEL_FORMAT_RGBX:
+				size *= 4;
+				break;
+			case PIXEL_FORMAT_YUV420SP:
+			case PIXEL_FORMAT_NV21:
+			case PIXEL_FORMAT_YV12:
+			case PIXEL_FORMAT_I420:
+				size = (size * 3) / 2;
+				break;
+		}
+		return size;
 	}
 
 	private UsbControlBlock mCtrlBlock;
