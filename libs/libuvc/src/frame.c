@@ -1102,8 +1102,9 @@ uvc_error_t uvc_yuyv2i420(uvc_frame_t *in, uvc_frame_t *out) {
 	}
 	RETURN(UVC_SUCCESS, int);
 }
-uvc_error_t uvc_yuyv2yv12(uvc_frame_t *in, uvc_frame_t *out) {
-
+/** NV12 **/
+//Todo: fix nv12 to work
+uvc_error_t uvc_yuyv2nv12(uvc_frame_t *in, uvc_frame_t *out) {
     ENTER();
 
     if (UNLIKELY(in->frame_format != UVC_FRAME_FORMAT_YUYV))
@@ -1121,9 +1122,11 @@ uvc_error_t uvc_yuyv2yv12(uvc_frame_t *in, uvc_frame_t *out) {
     const int32_t dest_width = out->width = out->step = in->width;
     const int32_t dest_height = out->height = in->height;
     const uint32_t hh = src_height < dest_height ? src_height : dest_height;
+
     uint8_t *y = dest;
-    uint8_t *v = dest + dest_width * dest_height;
-    uint8_t *u = dest + dest_width * dest_height * 5 / 4;
+    uint8_t *u = dest + dest_width * dest_height;
+    uint8_t *v = dest + dest_width * dest_height * 5 / 4;
+
     int h, w;
     for (h = 0; h < hh; h++) {
         const uint8_t *yuv = src + src_width * h;
@@ -1142,7 +1145,7 @@ uvc_error_t uvc_yuyv2yv12(uvc_frame_t *in, uvc_frame_t *out) {
             yuv += 8;	// (1pixel=2bytes)x4pixel=8bytes
         }
     }
-    RETURN(0, int);
+    RETURN(UVC_SUCCESS, uvc_error_t);
 }
 //--------------------------------------------------------------------------------
 uvc_error_t uvc_yuyv2iyuv420P(uvc_frame_t *in, uvc_frame_t *out) {
@@ -1205,9 +1208,10 @@ uvc_error_t uvc_yuyv2yuv420SP(uvc_frame_t *in, uvc_frame_t *out) {
 	const int32_t src_height = in->height;
 	const int32_t dest_width = out->width = out->step = in->width;
 	const int32_t dest_height = out->height = in->height;
-
 	const uint32_t hh = src_height < dest_height ? src_height : dest_height;
+
 	uint8_t *uv = dest + dest_width * dest_height;
+
 	int h, w;
 	for (h = 0; h < hh - 1; h += 2) {
 		uint8_t *y0 = dest + width * h;
